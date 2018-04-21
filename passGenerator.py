@@ -32,7 +32,7 @@ def randCharLD(length):
 def randCharLS(length):
     password = []
     password += secrets.choice(specials)
-    for i in range(length):
+    for i in range(length-2):
         odds = secrets.SystemRandom().randrange(0, 85)
         if odds < 40:
             password += secrets.choice(lower_letters)
@@ -47,7 +47,7 @@ def randCharLDS(length):
     password = []
     password += secrets.choice(numbers)
     password += secrets.choice(specials)
-    for i in range(length):
+    for i in range(length-2):
         odds = secrets.SystemRandom().randrange(0, 100)
         if odds < 40:
             password += secrets.choice(lower_letters)
@@ -68,5 +68,5 @@ def passGenerator(length,digits,specials):
         return "".join(randCharLD(length))
     elif digits == "off" and specials == "on":
         return "".join(randCharLS(length))
-    else:
+    elif digits == "off" and specials == "off":
         return "".join(randCharL(length))

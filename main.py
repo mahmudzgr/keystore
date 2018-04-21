@@ -30,16 +30,24 @@ class MyHandler(BaseHTTPRequestHandler):
                 f.close()
             elif urlparse(self.path).path == '/api/password':
                 query = parse_qs(urlparse(self.path).query)
-                length = query['length'][0]
+                length = int(query['length'][0])
                 digits = query['digits'][0]
-                specials = query['digits'][0]
-                self.send_response(200)
-                self.send_header('Content-type', 'text/html')
-                self.end_headers()
+                specials = query['specials'][0]
 
-                self.wfile.write('Length :\t{}<br>Digits :\t{}<br>Specials :\t{}<br><br>Password :\t'.format(length,digits,specials).encode())
 
-                self.wfile.write("{}".format(passGenerator(int(length),digits,specials)).encode())
+                if length < 4:
+                    self.send_response(500)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    self.wfile.write("Password has to composed of at least 4 characters!".encode())
+                else:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+
+                    self.wfile.write('Length :\t{}<br>Digits :\t{}<br>Specials :\t{}<br><br>Password :\t'.format(length,digits,specials).encode())
+
+                    self.wfile.write("{}".format(passGenerator(length,digits,specials)).encode())
 
             return
 
