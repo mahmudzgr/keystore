@@ -6,6 +6,7 @@ from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import os
 from passGenerator import *
+from PasswordGenerator import PasswordGenerator
 
 
 
@@ -48,6 +49,40 @@ class MyHandler(BaseHTTPRequestHandler):
                     self.wfile.write('Length :\t{}<br>Digits :\t{}<br>Specials :\t{}<br><br>Password :\t'.format(length,digits,specials).encode())
 
                     self.wfile.write("{}".format(passGenerator(length,digits,specials)).encode())
+            elif urlparse(self.path).path == '/api/password2':
+                query = parse_qs(urlparse(self.path).query)
+                length = 16
+                if 'length' in query:
+                    length = int(query['length'][0])
+                lowercase = False
+                if 'lowercase' in query:
+                    lowercase = query['lowercase'][0] == 'on'
+                uppercase = False
+                if 'uppercase' in query:
+                    uppercase = query['uppercase'][0] == 'on'
+                digits = False
+                if 'digits' in query:
+                    digits = query['digits'][0] == 'on'
+                specials = False
+                if 'specials' in query:
+                    specials = query['specials'][0] == 'on'
+
+                if length < 4:
+                    self.send_response(500)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+                    self.wfile.write("Password has to composed of at least 4 characters!".encode())
+                else:
+                    self.send_response(200)
+                    self.send_header('Content-type', 'text/html')
+                    self.end_headers()
+
+                    self.wfile.write('Length :\t{}<br>Digits :\t{}<br>Specials :\t{}<br><br>Password :\t'.format(length,digits,specials).encode())
+
+                    passgen = PasswordGenerator()
+                    passgen.set(lowercase, uppercase, digits, specials)
+
+                    self.wfile.write(passgen.generate(length).encode())
 
             return
 
